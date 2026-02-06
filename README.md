@@ -1,7 +1,7 @@
 # Student-Management-System-CRUD
 
 ## Project Summary
-This is a simple Student Management System built with the MERN stack (MongoDB, Express.js, React.js, Node.js). The application allows users to create, view, update, and delete student records. It demonstrates full stack CRUD functionality, API integration, and clean project structure with separate client (frontend) and server (backend) folders.
+This is a simple Student Management System built with the MERN stack (MongoDB, Express.js, React.js, Node.js). The application allows users to create, view, update, and delete student records through a simple and user-friendly web interface. It demonstrates full stack CRUD functionality, API integration, and clean project structure with separate client (frontend) and server (backend) folders.
 
 ## Setup Guide:
 1.	Clone the repository
