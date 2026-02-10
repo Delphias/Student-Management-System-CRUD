@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 const route = require("./routes/studentRoute.js");
 const cors = require("cors");
 
-dotenv.config();
+require("dotenv").config();
 
 const app = express();
 app.use(
@@ -16,8 +16,6 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 7000;
 const MONGODBURL = process.env.MONGODB_URL;
-
-console.log(`Server is currently running on port ${PORT}`);
 
 if (!MONGODBURL || typeof MONGODBURL !== "string") {
   console.error(
@@ -35,6 +33,8 @@ mongoose
       console.log(`Server is running on port : ${PORT} `);
     });
   })
-  .catch((error) => console.log(error));
+  .catch((err) => {
+    console.error("MongoDB connection failed:", err.message);
+  });
 
 app.use("/api", route);

@@ -9,8 +9,8 @@ This is a simple Student Management System built with the MERN stack (MongoDB, E
 •	Run command to navigate to root folder → cd student-management-system\project
 
 2.	Create a .env file with your MongoDB Atlas connection string
-•	MONGODB_URL=mongodb://localhost:27017/studentDB
-•	PORT=8000
+•	MONGODB_URL=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>
+•	PORT=7000
 
 3.	Backend setup (server/)
 •	Run command from root folder to navigate → cd server

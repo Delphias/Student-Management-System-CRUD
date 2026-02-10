@@ -2,29 +2,47 @@ import { useState, useEffect } from "react";
 import { StudentForm } from "./components/StudentForm";
 import { StudentList } from "./components/StudentList";
 import { GraduationCap } from "lucide-react";
-import { Student } from "./types/types.ts";
+import { Student } from "./types/types";
+import { useError } from "./hooks/useError";
 
 function App() {
   const [students, setStudents] = useState<Student[]>([]);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
+  const { error, setError: handleError, clearError } = useError();
 
   useEffect(() => {
     fetchStudents();
   }, []);
 
+  useEffect(() => {
+    if (error) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [error]);
+
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      setError(null);
+      clearError();
+
       const res = await fetch("/api/students");
-      if (!res.ok) throw new Error("Failed to fetch students");
-      const data = await res.json();
+
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {}
+
+      if (!res.ok) {
+        throw new Error(
+          data.message || "Failed to fetch students. Please try again.",
+        );
+      }
+
       setStudents(data.students || []);
     } catch (err) {
-      setError("Failed to fetch students");
-      console.error(err);
+      handleError(err, "Failed to fetch students");
     } finally {
       setLoading(false);
     }
@@ -32,20 +50,28 @@ function App() {
 
   const handleCreateStudent = async (student: Omit<Student, "_id">) => {
     try {
-      setError(null);
+      clearError();
+
       const res = await fetch("/api/student", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(student),
       });
 
-      if (!res.ok) throw new Error("Failed to create student");
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {}
 
-      const newStudent = await res.json();
-      setStudents((prev) => [...prev, newStudent.student]);
+      if (!res.ok) {
+        throw new Error(
+          data.message || "Failed to create student. Please try again.",
+        );
+      }
+
+      setStudents((prev) => [...prev, data.student]);
     } catch (err) {
-      setError("Failed to create student");
-      console.error(err);
+      handleError(err, "Failed to create student");
     }
   };
 
@@ -53,21 +79,31 @@ function App() {
     if (!editingStudent) return;
 
     try {
-      setError(null);
+      clearError();
+
       const res = await fetch(`/api/student/${editingStudent._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(student),
       });
-      if (!res.ok) throw new Error("Failed to update student");
-      const updated = await res.json();
+
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {}
+
+      if (!res.ok) {
+        throw new Error(
+          data.message || "Failed to update student. Please try again.",
+        );
+      }
+
       setStudents((prev) =>
-        prev.map((s) => (s._id === updated.student._id ? updated.student : s)),
+        prev.map((s) => (s._id === data.student._id ? data.student : s)),
       );
       setEditingStudent(null);
     } catch (err) {
-      setError("Failed to update student");
-      console.error(err);
+      handleError(err, "Failed to update student.");
     }
   };
 
@@ -75,13 +111,24 @@ function App() {
     if (!confirm("Are you sure you want to delete this student?")) return;
 
     try {
-      setError(null);
+      clearError();
+
       const res = await fetch(`/api/student/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete student");
+
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {}
+
+      if (!res.ok) {
+        throw new Error(
+          data.message || "Failed to delete student. Please try again.",
+        );
+      }
+
       setStudents((prev) => prev.filter((s) => s._id !== id));
     } catch (err) {
-      setError("Failed to delete student");
-      console.error(err);
+      handleError(err, "Failed to delete student.");
     }
   };
 
@@ -115,6 +162,12 @@ function App() {
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
             {error}
+            <button
+              className="ml-4 text-sm text-blue-600 underline"
+              onClick={clearError}
+            >
+              Dismiss
+            </button>
           </div>
         )}
 
